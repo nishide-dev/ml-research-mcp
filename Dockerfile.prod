@@ -1,0 +1,86 @@
+# Reference: https://docs.astral.sh/uv/guides/integration/docker/
+# Production version with UV tools (multi-stage build)
+
+# Define Python version as build argument
+ARG PYTHON_VERSION=3.12
+ARG UBUNTU_VERSION=22.04
+
+# First, build the application in the `/app` directory with UV
+FROM ghcr.io/astral-sh/uv:python${PYTHON_VERSION}-bookworm-slim as builder
+
+# Set environment variables for UV
+ENV UV_COMPILE_BYTECODE=1 UV_LINK_MODE=copy \
+    UV_PYTHON_DOWNLOADS=0
+
+WORKDIR /app
+RUN --mount=type=cache,target=/root/.cache/uv \
+    --mount=type=bind,source=uv.lock,target=uv.lock \
+    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
+    uv sync --frozen --no-install-project --no-dev
+ADD . /app
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --frozen --no-dev
+
+
+# Then, use a final image with minimal dependencies
+FROM ubuntu:${UBUNTU_VERSION}
+
+# Accept build argument for username with a default value
+ARG USERNAME=appuser
+
+# タイムゾーン設定を事前に指定して対話プロンプトを回避
+ENV DEBIAN_FRONTEND=noninteractive \
+    TZ=Asia/Tokyo \
+    LANG=C.UTF-8 \
+    LC_ALL=C.UTF-8
+
+# 必要なベースパッケージのみインストール
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone \
+    && apt-get update && apt-get install -y --no-install-recommends \
+    software-properties-common \
+    locales \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# ロケールの設定
+RUN echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen && \
+    locale-gen
+
+# APTでPython 3.12をインストール
+RUN add-apt-repository ppa:deadsnakes/ppa \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends \
+    python3.12 \
+    python3.12-venv \
+    python3.12-dev \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Make Python 3.12 the default
+RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.12 1 \
+    && update-alternatives --install /usr/bin/python python /usr/bin/python3.12 1
+
+# Copy UV binaries from builder
+COPY --from=builder /bin/uv /bin/uv
+COPY --from=builder /bin/uvx /bin/uvx
+
+# Create a user with the provided username
+RUN groupadd -r $USERNAME && useradd -r -g $USERNAME $USERNAME
+
+# Copy the application from the builder
+COPY --from=builder --chown=$USERNAME:$USERNAME /app /app
+
+# Place executables in the environment at the front of the path
+ENV PATH="/app/.venv/bin:$PATH"
+
+# Set working directory
+WORKDIR /app
+
+# Switch to the specified user
+USER $USERNAME
+
+# デフォルトのCMDを指定せず、docker run時にコマンドを渡せるようにする
+# 実行例:
+# docker run ml-research-mcp-prod python -m ml_research_mcp.main
+# または
+# docker run ml-research-mcp-prod python -c "import ml_research_mcp; print(ml_research_mcp.__version__)"

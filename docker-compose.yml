@@ -1,0 +1,59 @@
+# Docker Compose configuration for ml-research-mcp
+# Usage:
+#   Development: docker compose up dev
+#   Production:  docker compose up prod
+
+services:
+  # 開発環境 - ホットリロード対応、全開発ツール含む
+  dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+      args:
+        USERNAME: ${USERNAME:-appuser}
+        USER_ID: ${USER_ID:-1000}
+        GROUP_ID: ${GROUP_ID:-1000}
+    image: ml-research-mcp-dev:latest
+    container_name: ml-research-mcp-dev
+    volumes:
+      # プロジェクトディレクトリをマウント（ホットリロード用）
+      - .:/app
+      # UV キャッシュを永続化
+      - uv-cache:/home/${USERNAME:-appuser}/.cache/uv
+      # SSH キーをマウント（Gitアクセス用、オプション）
+      - ~/.ssh:/home/${USERNAME:-appuser}/.ssh:ro
+    ports:
+      - "8000:8000"  # アプリケーションポート（必要に応じて変更）
+      - "2222:2222"  # SSH ポート
+    environment:
+      - PYTHONUNBUFFERED=1
+      - UV_CACHE_DIR=/home/${USERNAME:-appuser}/.cache/uv
+    # 開発用はコマンド未指定（docker compose run dev <command> で自由に実行）
+    # command: python -m ml_research_mcp.main
+    stdin_open: true
+    tty: true
+
+  # 本番環境 - 最小依存関係、セキュリティ強化
+  prod:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+      args:
+        USERNAME: ${USERNAME:-appuser}
+    image: ml-research-mcp-prod:latest
+    container_name: ml-research-mcp-prod
+    # 本番環境ではボリュームマウントせず、イメージに含まれるコードを使用
+    ports:
+      - "8000:8000"  # アプリケーションポート（必要に応じて変更）
+    environment:
+      - PYTHONUNBUFFERED=1
+    # 本番用のコマンド（アプリケーションに応じて変更）
+    # command: python -m ml_research_mcp.main
+    restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp
+
+volumes:
+  uv-cache:
+    driver: local
