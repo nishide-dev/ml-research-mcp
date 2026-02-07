@@ -152,14 +152,10 @@ def plot_scatter(
         x_data = extract_column(df, x)
         y_data = extract_column(df, y)
         # For size and color, handle both column names and direct values
-        if size and isinstance(size, str):
-            size_data = extract_column(df, size)
-        else:
-            size_data = size
-        if color and isinstance(color, str):
-            color_data = extract_column(df, color)
-        else:
-            color_data = color
+        size_data = extract_column(df, size) if size and isinstance(size, str) else size
+        color_data = (
+            extract_column(df, color) if color and isinstance(color, str) else color
+        )
     else:
         x_data = x
         y_data = y

@@ -1,6 +1,5 @@
 """Tests for plotting core functionality."""
 
-import matplotlib.figure
 import pytest
 import ultraplot as uplt
 from PIL import Image

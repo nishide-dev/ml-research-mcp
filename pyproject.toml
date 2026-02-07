@@ -19,12 +19,14 @@ dependencies = [
     "pydantic>=2.0.0",
 ]
 
+[project.scripts]
+ml-research-mcp = "ml_research_mcp.server:main"
+
 # Classifiers help users find your project
 # See https://pypi.org/classifiers/
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
-    "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
 ]
@@ -51,6 +53,10 @@ packages = ["src/ml_research_mcp"]
 
 [tool.ty.environment]
 python-version = "3.12"
+
+[tool.ty.src]
+# Only check source code, not tests (which use MCP decorators)
+include = ["src/**/*.py"]
 
 [tool.ty.terminal]
 output-format = "full"

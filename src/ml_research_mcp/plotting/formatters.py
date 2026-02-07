@@ -4,7 +4,6 @@ This module provides functions to apply consistent styling
 to plots using UltraPlot's format() method.
 """
 
-
 import ultraplot as uplt
 
 

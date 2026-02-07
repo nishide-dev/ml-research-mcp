@@ -5,6 +5,7 @@ or direct dictionary input into Polars DataFrames.
 """
 
 from pathlib import Path
+from typing import overload
 
 import polars as pl
 
@@ -107,6 +108,14 @@ def load_data(
             "and lists of values."
         )
         raise ValueError(msg) from e
+
+
+@overload
+def extract_column(df: pl.DataFrame, column: str) -> pl.Series: ...
+
+
+@overload
+def extract_column(df: pl.DataFrame, column: list) -> list: ...
 
 
 def extract_column(
