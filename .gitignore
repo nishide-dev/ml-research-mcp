@@ -60,3 +60,6 @@ _tmp
 
 # Claude
 .claude
+
+# Generate Examples
+generate_examples.py

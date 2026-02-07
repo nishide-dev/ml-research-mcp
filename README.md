@@ -161,6 +161,21 @@ with open("plot.pdf", "wb") as f:
     f.write(image)
 ```
 
+## Example Gallery
+
+Real examples generated with ML Research MCP:
+
+| Query | Result |
+|-------|--------|
+| **Line Plot**<br>"Create a line plot showing temperature over time with x=[1,2,3,4,5,6] and y=[2,4,3,5,6,7]" | <img src="assets/example_line.png" width="400" alt="Line Plot"> |
+| **Scatter Plot**<br>"Make a scatter plot with color and size mapping using plasma colormap" | <img src="assets/example_scatter.png" width="400" alt="Scatter Plot"> |
+| **Bar Chart**<br>"Generate a bar chart comparing performance across categories A through E" | <img src="assets/example_bar.png" width="400" alt="Bar Chart"> |
+| **Histogram**<br>"Create a histogram with density normalization for distribution analysis" | <img src="assets/example_histogram.png" width="400" alt="Histogram"> |
+| **Violin Plot**<br>"Make a violin plot comparing Control vs Treatment groups" | <img src="assets/example_violin.png" width="400" alt="Violin Plot"> |
+| **Heatmap**<br>"Generate an annotated correlation matrix heatmap using RdBu colormap" | <img src="assets/example_heatmap.png" width="400" alt="Heatmap"> |
+
+All plots generated with publication-quality settings (150 DPI, customizable dimensions).
+
 ## Documentation
 
 ### Visualization Tools (Phase 1)
