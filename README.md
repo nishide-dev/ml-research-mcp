@@ -72,7 +72,21 @@ This project aims to be a comprehensive research assistant covering the entire M
 
 ## Installation
 
-### For MCP Users
+### Quick Start with Claude Code
+
+Add the server to Claude Code with a single command:
+
+```bash
+claude mcp add-json "ml-research" \
+  '{"command":"uvx","args":["--from","git+https://github.com/nishide-dev/ml-research-mcp","ml-research-mcp"]}'
+```
+
+Verify installation:
+```bash
+claude mcp list
+```
+
+### Manual Installation for MCP Clients
 
 Add to your MCP client configuration (e.g., `~/Library/Application Support/Claude/claude_desktop_config.json`):
 
@@ -80,11 +94,10 @@ Add to your MCP client configuration (e.g., `~/Library/Application Support/Claud
 {
   "mcpServers": {
     "ml-research": {
-      "command": "uv",
+      "command": "uvx",
       "args": [
-        "--directory",
-        "/path/to/ml-research-mcp",
-        "run",
+        "--from",
+        "git+https://github.com/nishide-dev/ml-research-mcp",
         "ml-research-mcp"
       ]
     }
@@ -92,12 +105,30 @@ Add to your MCP client configuration (e.g., `~/Library/Application Support/Claud
 }
 ```
 
+### Direct Execution with uvx
+
+Run the server directly without installation:
+
+```bash
+# From GitHub (recommended)
+uvx --from "git+https://github.com/nishide-dev/ml-research-mcp" ml-research-mcp
+
+# From local directory (for development)
+cd /path/to/ml-research-mcp
+uvx --from . ml-research-mcp
+```
+
 ### For Developers
+
+Clone and set up development environment:
 
 ```bash
 git clone https://github.com/nishide-dev/ml-research-mcp.git
 cd ml-research-mcp
 uv sync
+
+# Run in development mode
+uv run ml-research-mcp
 ```
 
 ## Quick Start

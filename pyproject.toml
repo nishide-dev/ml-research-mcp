@@ -18,10 +18,6 @@ dependencies = [
     "Pillow>=10.0.0",
     "pydantic>=2.0.0",
 ]
-
-[project.scripts]
-ml-research-mcp = "ml_research_mcp.server:main"
-
 # Classifiers help users find your project
 # See https://pypi.org/classifiers/
 classifiers = [
@@ -30,6 +26,9 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
 ]
+
+[project.scripts]
+ml-research-mcp = "ml_research_mcp.server:main"
 
 [build-system]
 requires = ["hatchling"]
